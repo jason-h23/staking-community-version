@@ -61,9 +61,8 @@ export default function useCallOperators() {
 	// This ensures contract calls go to the right network
 	const CONTRACT_ADDRESS = useMemo(() => {
 		try {
-			return getContractAddress(Number(DEFAULT_NETWORK));
+			return getContractAddress(chainId);
 		} catch {
-			// Fallback to DEFAULT_NETWORK if chainId is unsupported
 			return getContractAddress(Number(DEFAULT_NETWORK));
 		}
 	}, [chainId]);
