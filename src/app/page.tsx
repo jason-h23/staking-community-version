@@ -1,6 +1,5 @@
 "use client";
 
-import { Button, Flex } from "@chakra-ui/react";
 import Staking from "./Staking/index";
 import { useAccount, useChainId } from "wagmi";
 import Image from "next/image";
@@ -10,6 +9,7 @@ import useWalletModal from "@/hooks/modal/useWalletModal";
 import dynamic from "next/dynamic";
 import { useRecoilState } from "recoil";
 import { chainIdState } from "@/recoil/chainId";
+import WalletModal from "@/components/modal/WalletModal";
 
 const Candidates = dynamic(
 	() => import("./Staking/index"),
@@ -22,49 +22,25 @@ export default function Page() {
 	const { onOpenSelectModal } = useWalletModal();
 
 	return (
-		<Flex alignItems={"center"} h={"100%"} justifyContent={"center"}>
+		<div className="flex items-center h-full justify-center px-4 lg:px-0">
 			{address && SUPPORTED_CHAIN_IDS.includes(chainId || 0) ? (
 				<Candidates />
 			) : (
-				<Flex
-					w={"338px"}
-					h={"208px"}
-					p={"20px"}
-					alignItems={"center"}
-					justifyContent={"center"}
-					borderRadius={"10px"}
-					bgColor={"#fff"}
-					border={"1px solid #e7ebf2"}
-					flexDir={"column"}
-				>
+				<div className="w-full max-w-[338px] h-auto min-h-[208px] p-5 flex items-center justify-center rounded-[10px] bg-white border border-[#e7ebf2] flex-col">
 					<Image src={VECTOR} alt="vector" />
-					<Flex
-						color={"#1c1c1c"}
-						fontSize={"15px"}
-						fontWeight={300}
-						my={"20px"}
-						fontFamily={"Open Sans"}
-						textAlign={"center"}
-					>
+					<div className="text-[#1c1c1c] text-[15px] font-light my-5 font-open-sans text-center">
 						Connect your wallet to start Tokamak staking service
-					</Flex>
-					<Button
-						w={"298px"}
-						h={"40px"}
-						borderRadius={"4px"}
-						bgColor={"#257eee"}
-						color={"#fff"}
-						fontSize={"14px"}
-						fontFamily={"Roboto"}
-						_hover={{
-							bgColor: "#1a5cbf",
-						}}
+					</div>
+					<button
+						className="w-full max-w-[298px] h-10 rounded-[4px] bg-[#257eee] text-white text-sm font-roboto hover:bg-[#1a5cbf] transition-colors duration-200"
 						onClick={() => onOpenSelectModal()}
 					>
 						Connect Wallet
-					</Button>
-				</Flex>
+					</button>
+				</div>
 			)}
-		</Flex>
+			{/* WalletModal 추가 */}
+			<WalletModal />
+		</div>
 	);
 }

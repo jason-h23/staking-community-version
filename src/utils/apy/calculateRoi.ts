@@ -51,6 +51,6 @@ export function calculateRoiBasedonCompound(params: {
 
 	const apyPerMonth =
 		(1 + adjustedAPY) ** ((compoundsPerMonth * stakeDuration) / 31536000) - 1;
-
+	// console.log(apyPerMonth);
 	return apyPerMonth * 100;
 }

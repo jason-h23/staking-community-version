@@ -1,14 +1,3 @@
-import {
-	Flex,
-	Modal,
-	ModalBody,
-	ModalContent,
-	ModalOverlay,
-	useTheme,
-	Text,
-	Button,
-	Input,
-} from "@chakra-ui/react";
 import useCalculatorModal from "@/hooks/modal/useCalculatorModal";
 import { useCallback, useMemo, useState } from "react";
 import { ModalHeader } from "./components/ModalHeader";
@@ -23,8 +12,6 @@ import useCallSeigManager from "@/hooks/contracts/useCallSeigManager";
 import { useAllCandidatesTotalStaked } from "@tokamak-ecosystem/staking-sdk-react-kit";
 
 function CalculatorModal() {
-	const theme = useTheme();
-	const { btnStyle } = theme;
 	const { closeSelectModal, isOpen } = useCalculatorModal();
 
 	const [duration, setDuration] = useRecoilState(durationState);
@@ -97,131 +84,81 @@ function CalculatorModal() {
 		transition: "all 0.2s ease-in-out",
 	});
 
-	// const toStakeButton = useCallback(async () => {
-	//   setSelectedModal('staking');
-	//   setType('calculate');
-	//   setDuration('1-year');
-	// }, [setSelectedModal]);
+	if (!isOpen) return null;
 
 	return (
-		<Modal isOpen={isOpen} isCentered onClose={closeThisModal}>
-			<ModalOverlay>
-				<ModalContent
-					bg={"#fff"}
-					w={"350px"}
-					borderRadius={"15px"}
-					boxShadow={"0 2px 6px 0 rgba(61, 73, 93, 0.1)"}
-				>
-					<ModalBody>
-						<Flex w="100%" flexDir={"column"} alignItems={"center"} py={"10px"}>
-							<ModalHeader
-								main={"Staking Calculator"}
-								sub={
-									"The calculation is based on monthly compounding interest."
-								}
-								closeThisModal={closeThisModal}
-							/>
-							<Flex
-								w={"350px"}
-								borderY={"1px"}
-								py={"4px"}
-								borderColor={"#f4f6f8"}
-								flexDir={"column"}
-								alignItems={"center"}
+		<div className="fixed inset-0 z-50 flex items-center justify-center">
+			{/* Overlay */}
+			<div 
+				className="fixed inset-0 bg-black bg-opacity-50"
+				onClick={closeThisModal}
+			/>
+			
+			{/* Modal Content */}
+			<div className="relative bg-white w-[350px] rounded-[15px] shadow-[0_2px_6px_0_rgba(61,73,93,0.1)]">
+				<div className="w-full flex flex-col items-center py-2.5">
+					<ModalHeader
+						main={"Staking Calculator"}
+						sub={
+							"The calculation is based on monthly compounding interest."
+						}
+						closeThisModal={closeThisModal}
+					/>
+					<div className="w-[350px] border-y border-[#f4f6f8] py-1 flex flex-col items-center">
+						<div>
+							{type === "calculate" ? (
+								<CalculatorBody
+									userBalance={tonBalance?.data?.parsedBalance}
+									totalStaked={totalStaked}
+								/>
+							) : (
+								<div className="flex flex-col items-center">
+									<span className="mt-7.5 text-[13px] font-normal text-[#2a72e5]">
+										You can earn about
+									</span>
+									<div className="flex flex-row justify-center items-end mt-4.5">
+										<span className="text-[32px] font-medium text-[#304156] h-[43px]">
+											{rewardTON}
+										</span>
+										<span className="ml-1.5 text-[13px] font-medium text-[#3d495d]">
+											TON
+										</span>
+									</div>
+									<div className="flex flex-row justify-center mt-7.5 mb-9 h-4 w-[230px] text-xs text-[#808992]">
+										<span>
+											{roi.toLocaleString(undefined, {
+												maximumFractionDigits: 2,
+												minimumFractionDigits: 2,
+											})}
+											%
+										</span>
+									</div>
+								</div>
+							)}
+						</div>
+					</div>
+					<div className="flex flex-col items-center mt-6">
+						{type === "calculate" ? (
+							<button
+								className="h-[38px] rounded-[4px] border border-[#E7EBF2] bg-[#2a72e5] w-[130px] text-xs font-semibold text-white hover:bg-[#1a62d5] hover:border-[#1a62d5] transition-all duration-200"
+								onClick={() => calButton()}
 							>
-								<Flex>
-									{type === "calculate" ? (
-										<CalculatorBody
-											userBalance={tonBalance?.data?.parsedBalance}
-											totalStaked={totalStaked}
-										/>
-									) : (
-										<Flex flexDir={"column"} alignItems={"center"}>
-											<Text
-												mt={"30px"}
-												fontSize={"13px"}
-												fontWeight={"normal"}
-												color={"#2a72e5"}
-											>
-												You can earn about
-											</Text>
-											<Flex
-												flexDir={"row"}
-												justifyContent={"center"}
-												alignItems={"end"}
-												mt={"18px"}
-											>
-												<Text
-													fontSize={"32px"}
-													fontWeight={500}
-													color={"#304156"}
-													h={"43px"}
-												>
-													{rewardTON}
-												</Text>
-												<Text
-													ml={"5px"}
-													fontSize={"13px"}
-													fontWeight={500}
-													color={"#3d495d"}
-												>
-													TON
-												</Text>
-											</Flex>
-											<Flex
-												flexDir={"row"}
-												justifyContent={"center"}
-												mt={"30px"}
-												mb={"36px"}
-												h={"16px"}
-												w={"230px"}
-												fontSize={"12px"}
-												color={"#808992"}
-											>
-												<Text>
-													{roi.toLocaleString(undefined, {
-														maximumFractionDigits: 2,
-														minimumFractionDigits: 2,
-													})}
-													%
-												</Text>
-											</Flex>
-										</Flex>
-									)}
-								</Flex>
-							</Flex>
-							<Flex flexDir={"column"} alignItems={"center"} mt={"25px"}>
-								{type === "calculate" ? (
-									<Button
-										{...actionButtonStyle(true)}
-										fontWeight={500}
-										onClick={() => calButton()}
-									>
-										Calculate
-									</Button>
-								) : (
-									<Flex flexDir={"row"}>
-										{/* <Button
-                      {...actionButtonStyle(true)}
-                      mr={'10px'}
-                      // onClick={() => toStakeButton()}
-                    >
-                      Stake
-                    </Button> */}
-										<Button
-											{...actionButtonStyle(true)}
-											onClick={() => recalcButton()}
-										>
-											Recalculate
-										</Button>
-									</Flex>
-								)}
-							</Flex>
-						</Flex>
-					</ModalBody>
-				</ModalContent>
-			</ModalOverlay>
-		</Modal>
+								Calculate
+							</button>
+						) : (
+							<div className="flex flex-row">
+								<button
+									className="h-[38px] rounded-[4px] border border-[#E7EBF2] bg-[#2a72e5] w-[130px] text-xs font-semibold text-white hover:bg-[#1a62d5] hover:border-[#1a62d5] transition-all duration-200"
+									onClick={() => recalcButton()}
+								>
+									Recalculate
+								</button>
+							</div>
+						)}
+					</div>
+				</div>
+			</div>
+		</div>
 	);
 }
 

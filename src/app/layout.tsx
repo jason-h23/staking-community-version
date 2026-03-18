@@ -4,6 +4,7 @@ import RecoilRootWrapper from "@/app/Staking/components/RecoilWrapper";
 import { WagmiConfig } from "wagmi";
 import { wagmiConfig } from "@/providers/wagmiProvider";
 import Entry from "./Entry";
+import "@/styles/globals.css";
 
 export const metadata: Metadata = {
 	title: "TON Staking",

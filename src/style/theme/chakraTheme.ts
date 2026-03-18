@@ -46,27 +46,27 @@ const theme = extendTheme({
 				},
 			},
 		},
-		Drawer: {
-			variants: {
-				clickThrough: {
-					overlay: {
-						pointerEvents: "none",
-						background: "transparent",
-					},
+		// Drawer: {
+		// 	variants: {
+		// 		clickThrough: {
+		// 			overlay: {
+		// 				pointerEvents: "none",
+		// 				background: "transparent",
+		// 			},
 
-					dialogContainer: {
-						pointerEvents: "none",
-						background: "transparent",
-					},
-					dialog: {
-						pointerEvents: "auto",
-					},
-					input: {
-						pointerEvents: "auto",
-					},
-				},
-			},
-		},
+		// 			dialogContainer: {
+		// 				pointerEvents: "none",
+		// 				background: "transparent",
+		// 			},
+		// 			dialog: {
+		// 				pointerEvents: "auto",
+		// 			},
+		// 			input: {
+		// 				pointerEvents: "auto",
+		// 			},
+		// 		},
+		// 	},
+		// },
 	},
 
 	styles: {

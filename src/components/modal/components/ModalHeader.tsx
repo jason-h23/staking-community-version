@@ -1,5 +1,3 @@
-import { Flex, Text } from "@chakra-ui/react";
-// import CLOSE_ICON from 'assets/images/popup-close-icon.svg';
 import Image from "next/image";
 
 export const ModalHeader = (args: {
@@ -11,58 +9,41 @@ export const ModalHeader = (args: {
 }) => {
 	const { main, sub, closeThisModal, type, sub2 } = args;
 
+	const getRightPosition = () => {
+		if (main === "Withdraw" && type === 3) return "-490px";
+		if (main === "Withdraw" && type === 2) return "-330px";
+		if (main === "Withdraw") return "-160px";
+		if (type === 4) return "-180px";
+		if (main === "Stake") return "-110px";
+		return "-110px";
+	};
+
 	return (
-		<Flex pos={"relative"} flexDir={"column"} alignItems={"center"}>
-			<Flex
-				pos={"absolute"}
-				right={
-					main === "Withdraw" && type === 3
-						? "-490px"
-						: main === "Withdraw" && type === 2
-							? "-330px"
-							: main === "Withdraw"
-								? "-160px"
-								: type === 4
-									? "-180px"
-									: main === "Stake"
-										? "-110px"
-										: "-110px"
-				}
-				top={"-60px"}
-				cursor={"pointer"}
+		<div className="relative flex flex-col items-center">
+			<div
+				className="absolute cursor-pointer"
+				style={{
+					right: getRightPosition(),
+					top: "-60px"
+				}}
 				onClick={() => closeThisModal()}
 			>
-				{/* <Image src={CLOSE_ICON} alt={'CLOSE_ICON'}></Image> */}
-			</Flex>
-			<Text
-				color={"#3d495d"}
-				fontSize={"20px"}
-				fontWeight={"bold"}
-				mt={"6px"}
-				w={"200px"}
-				textAlign={"center"}
-			>
+				{/* Close icon would go here */}
+			</div>
+			<h2 className="text-[#3d495d] text-xl font-bold mt-1.5 w-[200px] text-center">
 				{main}
-			</Text>
-			<Flex
-				color={type === 2 ? "#3d495d" : "#86929d"}
-				fontSize={"12px"}
-				fontWeight={"normal"}
-				mb={"20px"}
-				maxW={"290px"}
-				textAlign={"center"}
-				flexDir={"row"}
-			>
-				<Text>{sub}</Text>
+			</h2>
+			<div className={`${type === 2 ? "text-[#3d495d]" : "text-[#86929d]"} text-xs font-normal mb-5 max-w-[290px] text-center flex flex-row`}>
+				<span>{sub}</span>
 				{type === 2 ? (
-					<Text color={"#257eee"} ml={"2px"}>
+					<span className="text-[#257eee] ml-0.5">
 						{sub2}
-					</Text>
+					</span>
 				) : (
 					""
 				)}
-			</Flex>
-		</Flex>
+			</div>
+		</div>
 	);
 };
 

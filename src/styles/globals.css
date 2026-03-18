@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 스크롤바 숨기기 유틸리티 */
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari and Opera */
+  }
+}
+
+/* 글로벌 스타일 - chakraTheme.ts에서 이전 */
+@layer base {
+  /* 전체 리셋 스타일 */
+  * {
+    outline: none;
+    box-shadow: none;
+  }
+
+  /* HTML, Body 기본 스타일 */
+  html, body {
+    background-color: #fafbfc;
+    color: #3d495d;
+  }
+}
+
+/* 커스텀 컴포넌트 클래스 */
+@layer components {
+  /* 헤더 오른쪽 공통 스타일 */
+  .header-right-common {
+    background-color: #FAFBFC;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  /* 카드 래퍼 스타일 */
+  .card-wrapper {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #1f2128;
+    align-items: center;
+    padding-top: 16px;
+    border-radius: 8px;
+  }
+
+  /* 카드 스타일 */
+  .card {
+    min-width: 200px;
+    min-height: 248px;
+    max-width: 200px;
+    max-height: 248px;
+  }
+
+  /* 빈 카드 스타일 */
+  .card-empty {
+    border: 1px dashed #313442;
+    border-radius: 16px;
+  }
+
+  /* 버튼 기본 스타일 리셋 */
+  button {
+    border-radius: 0;
+    box-shadow: none;
+    font-weight: normal;
+    /* color: #fff; */
+  }
+
+  button:hover {
+    background-color: transparent;
+  }
+
+  button:active {
+    /* 활성 상태 스타일 */
+  }
+
+  /* 입력 필드 기본 스타일 리셋 */
+  input {
+    border-radius: 0;
+    box-shadow: none;
+    font-weight: normal;
+  }
+
+  input:hover {
+    background-color: transparent;
+  }
+
+  input:active {
+    /* 활성 상태 스타일 */
+  }
+}

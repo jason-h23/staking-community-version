@@ -1,8 +1,8 @@
 "use client";
 
 import { theme } from "@/style/theme/chakraTheme";
-// import { CacheProvider } from "@chakra-ui/next-js";
 import { ChakraProvider } from "@chakra-ui/react";
+import { RecoilRoot } from "recoil";
 
 export function ChakraProvidersForNextJs({
 	children,
@@ -10,10 +10,10 @@ export function ChakraProvidersForNextJs({
 	children: React.ReactNode;
 }) {
 	return (
-		// <CacheProvider>
-		<ChakraProvider resetCSS theme={theme}>
-			{children}
-		</ChakraProvider>
-		// </CacheProvider>
+		<RecoilRoot>
+			<ChakraProvider resetCSS theme={theme}>
+				{children}
+			</ChakraProvider>
+		</RecoilRoot>
 	);
 }
