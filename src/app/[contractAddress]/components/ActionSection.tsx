@@ -1,7 +1,3 @@
-import {
-	actionButtonStyle,
-	withdrawOptionButtonStyle,
-} from "@/style/buttonStyle";
 import Image from "next/image";
 import LIST_ARROW from "@/assets/images/list-arrow_icon.svg";
 import LIST_ARROW_WHITE from "@/assets/images/list-arrow_icon_white.svg";

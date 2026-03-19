@@ -151,27 +151,17 @@ export function useTx(params: {
 				});
 
 				refreshedRef.current = true;
-				// Toast notification would go here
-				console.log("Transaction successful");
 				if (layer2) {
-					console.log("Transaction successful, refreshing operator data...");
 					try {
-						const success = await refreshOperator(layer2);
-						console.log("Refresh result:", success ? "Success" : "Failed");
+						await refreshOperator(layer2);
 					} catch (error) {
-						console.error("Error refreshing operator:", error);
+						// non-critical
 					}
 				}
 			}
 		};
 		handleSuccess();
 	}, [isSuccess, data, chainId, hash, layer2, refreshOperator, setTxData]);
-
-	useEffect(() => {
-		if (isSuccess) {
-			console.log("Transaction successful:", hash);
-		}
-	}, [isSuccess, hash]);
 
 	return { isLoading };
 }

@@ -120,7 +120,7 @@ export function useStakingInformation() {
 					}
 				}
 			} catch (error) {
-				console.error("Error fetching staking information:", error);
+				// non-critical
 			}
 		}
 

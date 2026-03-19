@@ -25,14 +25,14 @@ export const isAndroidDevice = (): boolean => {
 // Check if MetaMask is installed (works for both browser extension and mobile app browser)
 export const isMetaMaskInstalled = (): boolean => {
 	if (typeof window === "undefined") return false;
-	const ethereum = (window as any).ethereum;
+	const ethereum = window.ethereum;
 	return Boolean(ethereum && ethereum.isMetaMask);
 };
 
 // Check if we're inside the MetaMask in-app browser
 export const isInMetaMaskBrowser = (): boolean => {
 	if (typeof window === "undefined") return false;
-	const ethereum = (window as any).ethereum;
+	const ethereum = window.ethereum;
 	// MetaMask mobile browser has both isMetaMask and isMobile properties
 	return Boolean(
 		ethereum &&
@@ -44,7 +44,7 @@ export const isInMetaMaskBrowser = (): boolean => {
 // Check if any wallet provider is available
 export const hasWalletProvider = (): boolean => {
 	if (typeof window === "undefined") return false;
-	return Boolean((window as any).ethereum);
+	return Boolean(window.ethereum);
 };
 
 // Get the current dApp URL for deep linking
@@ -164,7 +164,7 @@ export const NETWORK_CONFIGS = {
 // Switch network in MetaMask
 export const switchNetwork = async (chainId: "0x1" | "0xaa36a7"): Promise<boolean> => {
 	if (typeof window === "undefined") return false;
-	const ethereum = (window as any).ethereum;
+	const ethereum = window.ethereum;
 	if (!ethereum) return false;
 
 	try {
@@ -187,11 +187,9 @@ export const switchNetwork = async (chainId: "0x1" | "0xaa36a7"): Promise<boolea
 				});
 				return true;
 			} catch (addError) {
-				console.error("Failed to add network:", addError);
 				return false;
 			}
 		}
-		console.error("Failed to switch network:", error);
 		return false;
 	}
 };

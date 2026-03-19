@@ -2,6 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Font fallbacks */
+body {
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.font-open-sans {
+  font-family: 'Open Sans', sans-serif;
+}
+
 /* 스크롤바 숨기기 유틸리티 */
 @layer utilities {
   .scrollbar-hide {

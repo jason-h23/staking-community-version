@@ -67,23 +67,6 @@ function CalculatorModal() {
 		setType("calculate");
 	}, []);
 
-	const actionButtonStyle = (isActive: boolean) => ({
-		h: "38px",
-		borderRadius: "4px",
-		border: "1px",
-		borderColor: "#E7EBF2",
-		bgColor: isActive ? "#2a72e5" : "white",
-		w: "130px",
-		fontSize: "12px",
-		fontWeight: 600,
-		color: isActive ? "white" : "#808992",
-		_hover: {
-			bgColor: isActive ? "#1a62d5" : "#f5f7fa",
-			borderColor: isActive ? "#1a62d5" : "#d7dbe2",
-		},
-		transition: "all 0.2s ease-in-out",
-	});
-
 	if (!isOpen) return null;
 
 	return (

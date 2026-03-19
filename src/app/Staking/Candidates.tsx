@@ -25,24 +25,24 @@ const Candidates: React.FC = () => {
 	);
 
 	const { baseOperators, repeatedOperators } = useMemo(() => {
-		const minItems = 30;
-		const base =
-			filteredOperators.length < minItems
-				? Array(minItems).fill(filteredOperators).flat().slice(0, minItems)
-				: filteredOperators;
+		const minItems = 20;
+		if (filteredOperators.length >= minItems) {
+			return { baseOperators: filteredOperators, repeatedOperators: filteredOperators };
+		}
 
-		const repeated = [
-			...base,
-			...base,
-			...base,
-		];
-		
-		return { baseOperators: base, repeatedOperators: repeated };
+		const base = filteredOperators.length > 0
+			? Array(Math.ceil(minItems / filteredOperators.length))
+				.fill(filteredOperators).flat().slice(0, minItems)
+			: [];
+
+		return {
+			baseOperators: base,
+			repeatedOperators: [...base, ...base, ...base],
+		};
 	}, [filteredOperators]);
 
 	const operatorsCount = baseOperators.length;
 
-	console.log("repeatedOperators", repeatedOperators.length);
 	useEffect(() => {
 		if (!mounted || loading) return;
 		const container = scrollContainerRef.current;
@@ -124,8 +124,8 @@ const Candidates: React.FC = () => {
 							<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2a72e5]"></div>
 						</div>
 					) : (
-						repeatedOperators.map((operator) => (
-							<OperatorItem key={operator.address} operator={operator} />
+						repeatedOperators.map((operator, index) => (
+							<OperatorItem key={`${operator.address}-${index}`} operator={operator} />
 						))
 					)}
 				</div>

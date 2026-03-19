@@ -33,7 +33,7 @@ const NetworkModal: FC = () => {
 				setIsOpen(false);
 			}
 		} catch (error) {
-			console.error("Failed to switch network:", error);
+			// non-critical
 		} finally {
 			setIsSwitching(false);
 		}
@@ -119,7 +119,7 @@ const NetworkModal: FC = () => {
 								Wrong Network
 							</h2>
 							<p className="text-gray-500 text-base sm:text-sm">
-								This app doesn't support your current network. Please switch to a supported network to continue.
+								This app doesn&apos;t support your current network. Please switch to a supported network to continue.
 							</p>
 						</div>
 

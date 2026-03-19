@@ -53,10 +53,8 @@ import { useMemo } from "react";
 import useWithdrawL2 from "@/hooks/staking/useWithdrawL2";
 import { ValueSection } from "./components/ValueSection";
 import { useStakingInformation } from "@/hooks/info/useStakingInfo";
-import { mainButtonStyle } from "@/style/buttonStyle";
 import { getButtonText } from "@/utils/button/getButtonText";
 import { ActionSection } from "./components/ActionSection";
-import { boxStyle } from "@/style/boxStyle";
 import useClaim from "@/hooks/staking/useClaim";
 import { useStakeWTON } from "@/hooks/staking/useStakeWTON";
 
@@ -98,8 +96,6 @@ export default function Page() {
 		address as `0x${string}`,
 	);
 
-	console.log("expSeig", expSeig, expectedSeigLoading);
-
 	useEffect(() => {
 		setIsClient(true);
 	}, []);
@@ -139,9 +135,9 @@ export default function Page() {
 	const { data: candidateStaked, isLoading: candidateStakedLoading } = useCandidateStake({
 		layer2Address: candidateAddress as `0x${string}`,
 	});
-	const { candidateMemo, isLoading: candidateMemoLoading } = useCandidateMemo(
-		candidateAddress as `0x${string}`
-	);
+	const { isCandidateAddon } = useIsCandidateAddon({
+		candidateAddress: candidateAddress as `0x${string}`,
+	});
 
 	const [activeToken, setActiveToken] = useState<string>("TON");
 	const [activeAction, setActiveAction] = useState<string>("Stake");
@@ -268,7 +264,7 @@ export default function Page() {
 						break;
 					}
 					default:
-						console.error("action mode is not found");
+						break;
 				}
 			} catch (err: any) {
 				// Error handling
@@ -514,7 +510,7 @@ export default function Page() {
 				</div>
 			</div>
 			
-			{isL2 ? (
+			{isCandidateAddon ? (
 				<div className="flex flex-col">
 					<div className="text-sm lg:text-base font-bold text-[#1c1c1c] flex justify-center w-full">
 						Sequencer seigniorage

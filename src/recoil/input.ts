@@ -1,13 +1,12 @@
 import { atom, selector } from "recoil";
-import { v1 } from "uuid";
 
 const inputState = atom({
-	key: `inputState/${v1()}`,
+	key: "inputState",
 	default: "0",
 });
 
 const inputBalanceState = selector({
-	key: `inputBalanceState/${v1()}`, // unique ID (with respect to other atoms/selectors)
+	key: "inputBalanceState",
 	get: ({ get }) => {
 		const selectedModalState = get(inputState);
 		return selectedModalState;
@@ -15,12 +14,12 @@ const inputBalanceState = selector({
 });
 
 const calculatorInputState = atom({
-	key: `inputState/${v1()}`,
+	key: "calculatorInputState",
 	default: "0",
 });
 
 const inputCalculatorBalanceState = selector({
-	key: `inputBalanceState/${v1()}`, // unique ID (with respect to other atoms/selectors)
+	key: "inputCalculatorBalanceState",
 	get: ({ get }) => {
 		const selectedModalState = get(calculatorInputState);
 		return selectedModalState;

@@ -27,7 +27,7 @@ export const floatParser = (num: string) => {
 		const parsed: number = parseFloat(num.replaceAll(",", ""));
 		return parsed;
 	} catch (e) {
-		console.log(e);
+		// non-critical
 	}
 };
 

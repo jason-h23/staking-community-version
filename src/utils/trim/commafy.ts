@@ -9,8 +9,7 @@ function commafy(
 		// if (defaultValueIsUndefined) return undefined;
 		return defaultValue ?? "-";
 	}
-	//@ts-ignore
-	if (isNaN(num)) {
+	if (Number.isNaN(Number(num))) {
 		// if (defaultValueIsUndefined) return undefined;
 		return defaultValue ?? "-";
 	}
@@ -51,8 +50,7 @@ export function commafyWithUndefined(
 		if (defaultValueIsUndefined) return undefined;
 		return "-";
 	}
-	//@ts-ignore
-	if (isNaN(num)) {
+	if (Number.isNaN(Number(num))) {
 		if (defaultValueIsUndefined) return undefined;
 		return "-";
 	}

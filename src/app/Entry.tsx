@@ -40,7 +40,7 @@ function WalletStateMonitor() {
 
 	// Listen for chain changes from ethereum provider
 	useEffect(() => {
-		const ethereum = (window as any).ethereum;
+		const ethereum = window.ethereum;
 		if (!ethereum) return;
 
 		const handleChainChanged = (hexChainId: string) => {

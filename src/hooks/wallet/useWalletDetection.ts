@@ -83,7 +83,7 @@ export default function useWalletDetection() {
 
 	// Listen for ethereum provider changes
 	useEffect(() => {
-		const ethereum = (window as any).ethereum;
+		const ethereum = window.ethereum;
 		if (!ethereum) return;
 
 		const handleChainChanged = () => {

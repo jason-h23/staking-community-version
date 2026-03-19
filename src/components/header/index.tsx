@@ -19,36 +19,13 @@ import ACCOUNT_COPY from "assets/images/account_copy_icon.png";
 import ETHERSCAN_LINK from "assets/images/etherscan_link_icon.png";
 import useWalletModal from "@/hooks/modal/useWalletModal";
 import { DEFAULT_NETWORK, SUPPORTED_CHAIN_IDS } from "@/constant";
+import { SUPPORTED_WALLETS } from "@/constant/wallets";
 
 const WALLET_VIEWS = {
 	OPTIONS: "options",
 	OPTIONS_SECONDARY: "options_secondary",
 	ACCOUNT: "account",
 	PENDING: "pending",
-};
-
-export const SUPPORTED_WALLETS: { [key: string]: any } = {
-	METAMASK: {
-		connector: "metaMask",
-		name: "MetaMask",
-		iconName: "metamask_icon.png",
-		description: "Connect to your MetaMask Wallet",
-		color: "#E8831D",
-	},
-	WALLET_CONNECT: {
-		connector: "walletConnect",
-		name: "WalletConnect",
-		iconName: "walletConnectIcon.svg",
-		description: "Connect to your WalletConnect Wallet",
-		color: "#3B99FC",
-	},
-	COINBASE_WALLET: {
-		connector: "coinbaseWallet",
-		name: "Coinbase Wallet",
-		iconName: "coinbaseWalletIcon.svg",
-		description: "Connect to your Coinbase Wallet",
-		color: "#315CF5",
-	},
 };
 
 export const Header = () => {

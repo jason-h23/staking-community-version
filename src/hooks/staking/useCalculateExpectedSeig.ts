@@ -128,10 +128,6 @@ export function useExpectedSeigs(
 				contractCache.set(cacheKey, contract);
 				return contract;
 			} catch (error) {
-				console.error(
-					`Failed to get contract instance for ${contractAddress}:`,
-					error,
-				);
 				return null;
 			}
 		},
@@ -290,8 +286,6 @@ export function useExpectedSeigs(
 				setExpectedSeig(seig < BigInt(0) ? "0" : seig.toString());
 				setLastSeigBlock(lastSeigBlockData.toString());
 			} catch (e) {
-				console.error("Error calculating expectedSeig:", e);
-			
 				setSeigOfLayer("0");
 				setExpectedSeig("0");
 				setLastSeigBlock("0");
