@@ -1,18 +1,4 @@
 import React from "react";
-import {
-	Modal,
-	ModalOverlay,
-	ModalContent,
-	ModalHeader,
-	ModalBody,
-	ModalCloseButton,
-	Flex,
-	Text,
-	Box,
-	Avatar,
-	VStack,
-	Center,
-} from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { useRecoilValue } from "recoil";
 import { filteredOperatorsState } from "@/recoil/staking/operator";
@@ -26,11 +12,6 @@ interface OperatorItemProps {
 	onClick: (address: string) => void;
 }
 
-interface OperatorSelectionModalProps {
-	isOpen: boolean;
-	onClose: () => void;
-}
-
 const OperatorItem: React.FC<OperatorItemProps> = ({
 	name,
 	address,
@@ -38,47 +19,20 @@ const OperatorItem: React.FC<OperatorItemProps> = ({
 	onClick,
 }) => {
 	return (
-		<Flex
-			h={"58px"}
-			py={"14px"}
-			px={"10px"}
-			alignItems="center"
-			cursor="pointer"
-			_hover={{ bg: "gray.50" }}
-			borderRadius="md"
+		<div
+			className="h-[58px] py-3.5 px-2.5 flex items-center cursor-pointer hover:bg-gray-50 rounded-md transition-colors"
 			onClick={() => onClick(address)}
 		>
-			{/* <Center 
-        bg={getAvatarBgColor(name)}
-        borderRadius="full"
-        w="30px"
-        h="30px"
-        mr={4}
-        fontSize="13px"
-        fontWeight={500}
-      >
-        {getInitials(name)}
-      </Center> */}
-			<Text fontSize="16px" fontWeight={600} color={"#131315"}>
+			{/* Avatar would go here */}
+			<span className="text-base font-semibold text-[#131315]">
 				{name}
-			</Text>
+			</span>
 			{isL2 && (
-				<Flex
-					bgColor={"#257eee"}
-					w={"34px"}
-					h={"18px"}
-					borderRadius={"3px"}
-					justifyContent={"center"}
-					fontSize={"12px"}
-					color={"#fff"}
-					fontWeight={600}
-					fontFamily={"Roboto"}
-					ml={"5px"}
-				>
+				<div className="bg-[#257eee] w-[34px] h-[18px] rounded-[3px] flex justify-center items-center text-xs text-white font-semibold font-roboto ml-1.5">
 					L2
-				</Flex>
+				</div>
 			)}
-		</Flex>
+		</div>
 	);
 };
 
@@ -93,23 +47,38 @@ const OperatorSelectionModal = () => {
 		closeSelectModal();
 	};
 
+	if (!isOpen) return null;
+
 	return (
-		<Modal isOpen={isOpen} onClose={closeSelectModal} isCentered size="md">
-			<ModalOverlay bg="blackAlpha.300" backdropFilter="blur(5px)" />
-			<ModalContent borderRadius="10px" maxW="360px" p={"20px"}>
-				<ModalHeader
-					borderBottomWidth="1px"
-					borderColor={"#DFE4EE"}
-					color="#131315"
-					// py={4}
-					fontSize="16px"
-					fontWeight={600}
-				>
-					Select an operator
-				</ModalHeader>
-				<ModalCloseButton size="lg" top={3.5} />
-				<ModalBody p={0} maxH="796px" overflowY="auto">
-					<VStack spacing={0} align="stretch" py={2}>
+		<div className="fixed inset-0 z-50 flex items-center justify-center">
+			{/* Overlay */}
+			<div 
+				className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm"
+				onClick={closeSelectModal}
+			/>
+			
+			{/* Modal Content */}
+			<div className="relative bg-white rounded-[10px] max-w-[360px] w-full mx-4 p-5 shadow-lg">
+				{/* Header */}
+				<div className="border-b border-[#DFE4EE] pb-4 mb-4">
+					<div className="flex justify-between items-center">
+						<h2 className="text-[#131315] text-base font-semibold">
+							Select an operator
+						</h2>
+						<button
+							onClick={closeSelectModal}
+							className="text-gray-400 hover:text-gray-600 transition-colors"
+						>
+							<svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+							</svg>
+						</button>
+					</div>
+				</div>
+				
+				{/* Body */}
+				<div className="max-h-[796px] overflow-y-auto">
+					<div className="flex flex-col space-y-0 py-2">
 						{operators.map((operator, key) => (
 							<OperatorItem
 								key={key}
@@ -119,10 +88,10 @@ const OperatorSelectionModal = () => {
 								onClick={handleSelectOperator}
 							/>
 						))}
-					</VStack>
-				</ModalBody>
-			</ModalContent>
-		</Modal>
+					</div>
+				</div>
+			</div>
+		</div>
 	);
 };
 

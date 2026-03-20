@@ -1,14 +1,3 @@
-import {
-	InputGroup,
-	useColorMode,
-	NumberInput,
-	Text,
-	NumberInputField,
-	Button,
-	Flex,
-	useTheme,
-	Input,
-} from "@chakra-ui/react";
 import { calculatorInputState, inputState } from "recoil/input";
 import React from "react";
 import { useRecoilState } from "recoil";
@@ -61,8 +50,6 @@ function BalanceInput(props: InputProp) {
 	const [value, setValue] = useRecoilState(inputState);
 	const [calculatorValue, setCalculatorValue] =
 		useRecoilState(calculatorInputState);
-	const theme = useTheme();
-	const { INPUT_STYLE } = theme;
 
 	const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const { target } = event;
@@ -99,120 +86,63 @@ function BalanceInput(props: InputProp) {
 		return `${maxPosition}px`;
 	};
 
-	const inputStaking = () => ({
-		fontSize: "30px",
-		height: "100%",
-		borderRadius: 0,
-		textAlign: "center",
-		overflow: "auto",
-		fontWeight: 600,
-		fontFamily: "Open Sans",
-		_placeholder: { color: "#304156" },
-		border: "",
-		mt: "4.5px",
-		ml: "15px",
-	});
-
-	const inputUnstaking = () => ({
-		fontSize: "18px",
-		height: "100%",
-		borderRadius: 0,
-		textAlign: "right",
-		overflow: "auto",
-		fontWeight: "bold",
-		_placeholder: { color: "#c6cbd9" },
-		border: "",
-		// ml:'15px',
-	});
-	const inputCalc = () => ({
-		fontSize: "13px",
-		fontWeight: "normal",
-		height: "28px",
-		border: "none",
-		textAlign: "right",
-		color: "#3e495c",
-		_placeholder: { color: "#86929d" },
-		padding: "0px",
-		width: "70px",
-		marginLeft: "5px",
-		marginTop: "1px",
-	});
+	const getInputStyles = () => {
+		if (type === "staking") {
+			return "text-[30px] h-full rounded-none text-left overflow-auto font-semibold font-open-sans placeholder:text-[#304156] border-0 mt-1.5 ml-4";
+		} else if (type === "unstaking") {
+			return "text-lg h-full rounded-none text-right overflow-auto font-bold placeholder:text-[#c6cbd9] border-0";
+		} else if (type === "calculator") {
+			// Calculator 모달용 스타일 - 입력 필드를 왼쪽으로 이동
+			return "text-[13px] font-normal h-7 border-none text-right text-[#3e495c] placeholder:text-[#86929d] p-0 w-[65px] ml-1.5 mt-0.5";
+		} else {
+			return "text-[13px] font-normal h-7 border-none text-right text-[#3e495c] placeholder:text-[#86929d] p-0 w-[70px] ml-1.5 mt-0.5";
+		}
+	};
 
 	return (
-		<Flex alignItems="center" position="relative" justifyContent="flex-start">
-			<NumberInput
-				isInvalid={isError}
-				w={type === "staking" ? "auto" : "118px"}
-				h={h || 45}
-				focusBorderColor={"#fff"}
-				borderRadius={"4px"}
-				value={addComma(type === "staking" ? value : calculatorValue)}
-				position="relative"
-				border={
-					type === "staking" || type === "unstaking"
-						? "none"
-						: "1px solid #dfe4ee"
-				}
-				mr={"5px"}
-			>
-				<Flex>
-					<NumberInputField
-						color="#1c1c1c"
-						p={0}
-						pl={0}
-						{...(type === "staking"
-							? { ...inputStaking() }
-							: type === "unstaking"
-								? { ...inputUnstaking() }
-								: { ...inputCalc() })}
-						textAlign="left"
-						_placeholder={{
-							color: "#C6CBD9",
-							fontWeight: 600,
-						}}
+		<div className="flex items-center relative justify-start">
+			{/* Staking용 MAX 버튼 - 왼쪽에 배치 */}
+			{/* {type === "staking" && (
+				<button
+					className="w-[43px] h-5 border border-[#dfe4ee] rounded-[4px] bg-white text-xs font-normal font-open-sans text-[#86929d] z-[1] hover:bg-gray-50 transition-colors mr-2"
+					onClick={() => {
+						setValue(String(maxValue));
+					}}
+				>
+					MAX
+				</button>
+			)} */}
+			
+			<div className={`${type === "staking" ? "w-auto" : "w-[118px]"} ${h ? `h-[${h}px]` : "h-[45px]"} ${isError ? "border-red-500" : ""} rounded-[4px] ${type === "staking" || type === "unstaking" ? "border-0" : "border border-[#dfe4ee]"} mr-1.5 relative`}>
+				<div className="flex">
+					<input
+						className={`${getInputStyles()} text-[#1c1c1c] p-0 pl-0 text-left placeholder:text-[#C6CBD9] placeholder:font-semibold w-auto focus:outline-none`}
 						placeholder={placeHolder}
 						onChange={onChange}
-						width="auto"
+						value={addComma(type === "staking" ? value : calculatorValue)}
 					/>
-					{type === "staking" ? (
-						""
-					) : (
-						<Text
-							fontSize={"13px"}
-							fontWeight={"normal"}
-							mr={"10px"}
-							ml={"7px"}
-							mt={"5px"}
-						>
+					{type !== "staking" && (
+						<span className="text-[13px] font-normal mr-2.5 ml-1.5 mt-1.5">
 							TON
-						</Text>
+						</span>
 					)}
-				</Flex>
-			</NumberInput>
-			<Button
-				position={type === "staking" ? "absolute" : "relative"}
-				left={type === "staking" ? getButtonPosition() : ""}
-				bottom={type === "staking" ? "35%" : ""}
-				w={"43px"}
-				h={"20px"}
-				border={"1px solid #dfe4ee"}
-				borderRadius={"4px"}
-				bgColor={"#fff"}
-				fontSize={"12px"}
-				fontWeight={"normal"}
-				fontFamily={"Open Sans"}
-				// {...(type === 'staking' || type === 'unstaking' ? {...maxStaking()}: {...maxCalc()})}
-				color={"#86929d"}
-				zIndex={1}
-				onClick={() => {
-					type === "staking"
-						? setValue(String(maxValue))
-						: setCalculatorValue(String(maxValue));
-				}}
-			>
-				MAX
-			</Button>
-		</Flex>
+				</div>
+			</div>
+			
+			{/* Calculator용 MAX 버튼 - 오른쪽에 배치 */}
+			{(type === "calculator" || type === "staking") && (
+				<button
+					className="w-[43px] h-5 border border-[#dfe4ee] rounded-[4px] bg-white text-xs font-normal font-open-sans text-[#86929d] z-[1] hover:bg-gray-50 transition-colors"
+					onClick={() => {
+						type === "staking"
+							? setValue(String(maxValue))
+							: setCalculatorValue(String(maxValue));
+					}}
+				>
+					MAX
+				</button>
+			)}
+		</div>
 	);
 }
 

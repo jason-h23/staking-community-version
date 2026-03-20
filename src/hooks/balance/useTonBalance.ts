@@ -6,8 +6,6 @@ import { SupportedChainId } from "@/types/network/supportedNetwork";
 import { getContractAddress } from "@/constant/contracts";
 
 export default function useTokenBalance(
-	// requireCall?: boolean,
-	// watch?: boolean
 	token: string,
 ) {
 	const chainId = useChainId();
@@ -19,9 +17,6 @@ export default function useTokenBalance(
 	const { data, error, isLoading, isSuccess } = useBalance({
 		address: accountAddress,
 		token: (tokenAddress as "0x${string}") ?? null,
-
-		// staleTime: 5000,
-		// enabled: requireCall,
 	});
 
 	const tokenBalance = useMemo(() => {
@@ -31,15 +26,13 @@ export default function useTokenBalance(
 					balanceBN: data,
 					parsedBalance: commafy(
 						ethers.utils.formatUnits(
-							//@ts-ignore
-							typeof data.value === "bigint" ? data.value : "0",
+							data.value.toString(),
 							data.decimals as number,
 						),
 					),
 					parsedBalanceWithoutCommafied: commafy(
 						ethers.utils.formatUnits(
-							//@ts-ignore
-							typeof data.value === "bigint" ? data.value : "0",
+							data.value.toString(),
 							data.decimals as number,
 						),
 						data.decimals as number,
@@ -52,6 +45,5 @@ export default function useTokenBalance(
 		}
 		return null;
 	}, [accountAddress, data, token]);
-	// console.log(tokenBalance)
 	return tokenBalance;
 }

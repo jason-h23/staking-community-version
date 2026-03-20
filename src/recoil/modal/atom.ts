@@ -31,3 +31,14 @@ export const calculatorModalStatus = atom<boolean>({
 	key: "calculatorStatus",
 	default: false,
 });
+
+// New modal atoms for mobile wallet experience
+export const networkModalStatus = atom<boolean>({
+	key: "networkModalStatus",
+	default: false,
+});
+
+export const installMetaMaskModalStatus = atom<boolean>({
+	key: "installMetaMaskModalStatus",
+	default: false,
+});

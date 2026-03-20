@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import "./globals.css";
+import "@/styles/globals.css";
 import RecoilRootWrapper from "@/app/Staking/components/RecoilWrapper";
 import { WagmiConfig } from "wagmi";
 import { wagmiConfig } from "@/providers/wagmiProvider";

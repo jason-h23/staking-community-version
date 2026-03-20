@@ -81,7 +81,7 @@ export function useWithdrawableLength(layer2: Address | undefined) {
 			setWithdrawableLength(String(withdrawableList.length));
 			setPendingRequests(Number(numPendingRequests));
 		} catch (error) {
-			console.error("Error fetching withdrawable length:", error);
+			// non-critical
 		} finally {
 			setIsLoading(false);
 		}

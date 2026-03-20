@@ -1,5 +1,3 @@
-import { Flex } from "@chakra-ui/react";
-
 type TokenTypeSelectorProps = {
 	tab: any;
 	setTab: any;
@@ -10,44 +8,33 @@ export const TokenTypeSelector = (args: TokenTypeSelectorProps) => {
 	const mobile = false;
 
 	return (
-		<Flex
-			w={mobile ? "100%" : "146px"}
-			h={mobile ? "40px" : "25px"}
-			p={"1px"}
-			border={"solid 1px #e7ebf2"}
-			borderRadius={"5px"}
-			fontSize={mobile ? "13px" : "12px"}
-			fontWeight={mobile ? 500 : "normal"}
-			justifyContent={"space-between"}
+		<div
+			className={`${
+				mobile ? "w-full h-10" : "w-[146px] h-[25px]"
+			} p-[1px] border border-[#e7ebf2] rounded-[5px] ${
+				mobile ? "text-[13px] font-medium" : "text-xs font-normal"
+			} flex justify-between`}
 		>
-			<Flex
-				w={mobile ? "50%" : "73px"}
-				textAlign={"center"}
-				h={mobile ? "30px" : "22px"}
-				borderRadius={"5px"}
-				color={tab === "TON" ? "#fff" : ""}
-				bg={tab === "TON" ? "#2a72e5" : "#fff"}
-				justifyContent={"center"}
-				alignItems={"center"}
+			<div
+				className={`${
+					mobile ? "w-1/2 h-[30px]" : "w-[73px] h-[22px]"
+				} text-center rounded-[5px] ${
+					tab === "TON" ? "text-white bg-[#2a72e5]" : "text-black bg-white"
+				} flex justify-center items-center cursor-pointer transition-colors duration-200 hover:opacity-80`}
 				onClick={() => setTab("TON")}
-				cursor={"pointer"}
 			>
 				TON
-			</Flex>
-			<Flex
-				w={mobile ? "50%" : "73px"}
-				textAlign={"center"}
-				h={mobile ? "30px" : "22px"}
-				borderRadius={"5px"}
-				color={tab === "WTON" ? "#fff" : ""}
-				bg={tab === "WTON" ? "#2a72e5" : "#fff"}
-				justifyContent={"center"}
-				alignItems={"center"}
+			</div>
+			<div
+				className={`${
+					mobile ? "w-1/2 h-[30px]" : "w-[73px] h-[22px]"
+				} text-center rounded-[5px] ${
+					tab === "WTON" ? "text-white bg-[#2a72e5]" : "text-black bg-white"
+				} flex justify-center items-center cursor-pointer transition-colors duration-200 hover:opacity-80`}
 				onClick={() => setTab("WTON")}
-				cursor={"pointer"}
 			>
 				WTON
-			</Flex>
-		</Flex>
+			</div>
+		</div>
 	);
 };

@@ -11,7 +11,6 @@ import { useChainId, useWaitForTransactionReceipt } from "wagmi";
 import useCallOperators from "../staking/useCallOperators";
 import { inputState } from "@/recoil/input";
 import { useRef } from "react";
-import { useToast } from "@chakra-ui/react";
 
 export function useTransaction() {
 	const [txData] = useRecoilState(txDataStatus);
@@ -67,10 +66,6 @@ export function useTransaction() {
 		}
 	}, [txData]);
 
-	// useEffect(() => {
-	//   setTxData(undefined);
-	// }, [connectedChainId]);
-
 	return {
 		allTransaction: txData,
 		pendingTransaction,
@@ -85,11 +80,9 @@ export function useTransaction() {
 export function useTx(params: {
 	hash: `0x${string}` | undefined;
 	layer2: `0x${string}`;
-	// actionSort?: ActionSort;
 }) {
 	const { hash, layer2 } = params;
 	const chainId = useChainId();
-	const toast = useToast();
 	const { data, isLoading, isSuccess, isError } = useWaitForTransactionReceipt({
 		hash,
 		chainId: chainId,
@@ -158,31 +151,17 @@ export function useTx(params: {
 				});
 
 				refreshedRef.current = true;
-				toast({
-					title: "Send Transaction Successfully",
-					status: "success",
-					duration: 2000,
-					isClosable: true,
-				});
 				if (layer2) {
-					console.log("Transaction successful, refreshing operator data...");
 					try {
-						const success = await refreshOperator(layer2);
-						console.log("Refresh result:", success ? "Success" : "Failed");
+						await refreshOperator(layer2);
 					} catch (error) {
-						console.error("Error refreshing operator:", error);
+						// non-critical
 					}
 				}
 			}
 		};
 		handleSuccess();
 	}, [isSuccess, data, chainId, hash, layer2, refreshOperator, setTxData]);
-
-	useEffect(() => {
-		if (isSuccess) {
-			console.log("Transaction successful:", hash);
-		}
-	}, [isSuccess, hash]);
 
 	return { isLoading };
 }
