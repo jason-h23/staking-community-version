@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "export": "next build && next export",
-    "deploy": "npm run build"
+    "deploy": "npm run build",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "@apollo/client": "^3.7.15",
@@ -36,11 +38,15 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.1.2",
+    "@playwright/test": "^1.58.2",
+    "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^20.17.23",
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^6.0.1",
     "@wagmi/cli": "latest",
     "autoprefixer": "^10.4.21",
     "bufferutil": "^4.0.8",
