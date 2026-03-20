@@ -7,6 +7,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider, createConfig, http } from "wagmi";
 import { mainnet, sepolia } from "wagmi/chains";
 import { operatorsListState, type Operator } from "@/recoil/staking/operator";
+import { inputState } from "@/recoil/input";
+import { txPendingStatus } from "@/recoil/transaction/tx";
 import { MOCK_OPERATORS } from "../helpers/mocks/mockOperators";
 import { sdkMocks } from "../helpers/mocks/mockSdkReactKit";
 
@@ -113,14 +115,15 @@ vi.mock("@/hooks/info/useStakingInfo", () => ({
 }));
 
 // useWithdrawableLength
+const mockWithdrawableData = vi.fn().mockReturnValue({
+	withdrawableAmount: "0",
+	withdrawableLength: "0",
+	pendingRequests: 0,
+	pendingUnstaked: "0",
+	isLoading: false,
+});
 vi.mock("@/hooks/staking/useWithdrawable", () => ({
-	useWithdrawableLength: () => ({
-		withdrawableAmount: "0",
-		withdrawableLength: "0",
-		pendingRequests: 0,
-		pendingUnstaked: "0",
-		isLoading: false,
-	}),
+	useWithdrawableLength: (...args: unknown[]) => mockWithdrawableData(...args),
 }));
 
 // useExpectedSeigs
@@ -232,13 +235,16 @@ const TEST_OPERATOR: Operator = {
 	isL2: false,
 };
 
-function renderStakingPage() {
+function renderStakingPage(
+	customInitializeState?: (snapshot: MutableSnapshot) => void,
+) {
 	const queryClient = new QueryClient({
 		defaultOptions: { queries: { retry: false, gcTime: 0 } },
 	});
 
 	const initializeState = (snapshot: MutableSnapshot) => {
 		snapshot.set(operatorsListState, [TEST_OPERATOR]);
+		customInitializeState?.(snapshot);
 	};
 
 	return render(
@@ -362,5 +368,408 @@ describe("StakingPage", () => {
 		renderStakingPage();
 
 		expect(screen.getByText(/Balance:/)).toBeInTheDocument();
+	});
+
+	describe("onClick handler - Stake action", () => {
+		beforeEach(() => {
+			mockStakeTON.mockClear();
+			mockStakeWTON.mockClear();
+			mockUnstake.mockClear();
+			mockRestake.mockClear();
+			mockWithdraw.mockClear();
+			mockWithdrawL2.mockClear();
+			mockWithdrawableData.mockReturnValue({
+				withdrawableAmount: "0",
+				withdrawableLength: "0",
+				pendingRequests: 0,
+				pendingUnstaked: "0",
+				isLoading: false,
+			});
+		});
+
+		it("calls stakeTON when Stake action is active with TON token and valid amount", async () => {
+			const user = userEvent.setup();
+			renderStakingPage((snapshot) => {
+				snapshot.set(inputState, "5");
+			});
+
+			// Multiple buttons match "Stake" (action tab + main submit button)
+			// The main submit button is the last one in DOM order
+			const stakeButtons = screen.getAllByRole("button", { name: /^Stake$/i });
+			const mainButton = stakeButtons[stakeButtons.length - 1];
+			expect(mainButton).not.toBeDisabled();
+
+			await user.click(mainButton);
+			expect(mockStakeTON).toHaveBeenCalledTimes(1);
+		});
+
+		it("switches WTON token display when WTON tab is clicked", async () => {
+			const user = userEvent.setup();
+			renderStakingPage((snapshot) => {
+				snapshot.set(inputState, "2");
+			});
+
+			// Switch to WTON token
+			await user.click(screen.getByText("WTON"));
+
+			// The token symbol next to the input should now show WTON
+			const tokenLabels = screen.getAllByText("WTON");
+			expect(tokenLabels.length).toBeGreaterThanOrEqual(2); // selector tab + token display
+
+			// The main button should still be enabled with a valid value
+			const stakeButtons = screen.getAllByRole("button", { name: /^Stake$/i });
+			const mainButton = stakeButtons[stakeButtons.length - 1];
+			expect(mainButton).not.toBeDisabled();
+		});
+	});
+
+	describe("onClick handler - Unstake action", () => {
+		beforeEach(() => {
+			mockUnstake.mockClear();
+			mockWithdrawableData.mockReturnValue({
+				withdrawableAmount: "0",
+				withdrawableLength: "0",
+				pendingRequests: 0,
+				pendingUnstaked: "0",
+				isLoading: false,
+			});
+		});
+
+		it("button is disabled after switching to Unstake (ActionSection resets value)", async () => {
+			const user = userEvent.setup();
+			renderStakingPage((snapshot) => {
+				snapshot.set(inputState, "0.5");
+			});
+
+			// Switching to Unstake resets value via ActionSection's setValue("")
+			await user.click(screen.getByRole("button", { name: /Unstake/ }));
+
+			// Button shows "Enter an amount" when value is reset
+			expect(screen.getByRole("button", { name: /Enter an amount/i })).toBeDisabled();
+		});
+
+		it("does not call unstake when amount exceeds staked balance", async () => {
+			const user = userEvent.setup();
+			renderStakingPage((snapshot) => {
+				// userStaked is 1 TON in RAY, set input to 2 (more than staked)
+				snapshot.set(inputState, "2");
+			});
+
+			// Switch to Unstake action
+			await user.click(screen.getByRole("button", { name: /Unstake/ }));
+
+			// The button should be disabled because ActionSection resets value to ""
+			expect(screen.getByRole("button", { name: /Enter an amount/i })).toBeDisabled();
+		});
+	});
+
+	describe("onClick handler - Withdraw action", () => {
+		beforeEach(() => {
+			mockWithdraw.mockClear();
+		});
+
+		it("calls withdraw when Withdraw action is clicked with non-zero withdrawable amount", async () => {
+			// Mock non-zero withdrawable amount so ActionSection sets a valid value
+			mockWithdrawableData.mockReturnValue({
+				withdrawableAmount: "5000000000000000000000000000", // 5 TON in RAY
+				withdrawableLength: "1",
+				pendingRequests: 1,
+				pendingUnstaked: "0",
+				isLoading: false,
+			});
+
+			const user = userEvent.setup();
+			const queryClient = new QueryClient({
+				defaultOptions: { queries: { retry: false, gcTime: 0 } },
+			});
+
+			const initializeState = (snapshot: MutableSnapshot) => {
+				snapshot.set(operatorsListState, [TEST_OPERATOR]);
+			};
+
+			render(
+				<WagmiProvider config={testConfig}>
+					<QueryClientProvider client={queryClient}>
+						<RecoilRoot initializeState={initializeState}>
+							<Page />
+						</RecoilRoot>
+					</QueryClientProvider>
+				</WagmiProvider>,
+			);
+
+			// Click Withdraw - ActionSection will set value to formatUnits(withdrawableAmount, 27)
+			await user.click(screen.getByRole("button", { name: "Withdraw" }));
+
+			const mainButtons = screen.getAllByRole("button").filter(
+				btn => btn.classList.contains("w-full")
+			);
+			const mainButton = mainButtons[0];
+
+			await user.click(mainButton);
+			expect(mockWithdraw).toHaveBeenCalledTimes(1);
+		});
+	});
+
+	describe("onClick handler - Restake action", () => {
+		beforeEach(() => {
+			mockRestake.mockClear();
+		});
+
+		it("calls restake when Restake action is clicked with non-zero pending unstaked", async () => {
+			// Mock non-zero pendingUnstaked so ActionSection sets a valid value
+			mockWithdrawableData.mockReturnValue({
+				withdrawableAmount: "0",
+				withdrawableLength: "0",
+				pendingRequests: 2,
+				pendingUnstaked: "3000000000000000000000000000", // 3 TON in RAY
+				isLoading: false,
+			});
+
+			const user = userEvent.setup();
+			renderStakingPage();
+
+			// Click Restake - ActionSection will set value to formatUnits(pendingUnstaked, 27)
+			await user.click(screen.getByRole("button", { name: "Restake" }));
+
+			const restakeButtons = screen.getAllByRole("button", { name: /^Restake$/i });
+			const mainButton = restakeButtons[restakeButtons.length - 1];
+			await user.click(mainButton);
+			expect(mockRestake).toHaveBeenCalledTimes(1);
+		});
+	});
+
+	describe("isUnstakeDisabled logic", () => {
+		it("disables button when unstake action is active and no value is entered", async () => {
+			const user = userEvent.setup();
+			renderStakingPage((snapshot) => {
+				snapshot.set(inputState, "0");
+			});
+
+			await user.click(screen.getByRole("button", { name: /Unstake/ }));
+
+			expect(screen.getByRole("button", { name: /Enter an amount/i })).toBeDisabled();
+		});
+
+		it("disables button when unstake value is 0.00", async () => {
+			const user = userEvent.setup();
+			renderStakingPage((snapshot) => {
+				snapshot.set(inputState, "0.00");
+			});
+
+			await user.click(screen.getByRole("button", { name: /Unstake/ }));
+
+			expect(screen.getByRole("button", { name: /Enter an amount/i })).toBeDisabled();
+		});
+	});
+
+	describe("showUnstakeWarning logic", () => {
+		beforeEach(() => {
+			mockWithdrawableData.mockReturnValue({
+				withdrawableAmount: "0",
+				withdrawableLength: "0",
+				pendingRequests: 0,
+				pendingUnstaked: "0",
+				isLoading: false,
+			});
+		});
+
+		it("does not show unstake warning when Stake action is active (even with value)", () => {
+			renderStakingPage((snapshot) => {
+				snapshot.set(inputState, "2");
+			});
+
+			expect(
+				screen.queryByText(/Unstake amount exceeds your staked amount/),
+			).not.toBeInTheDocument();
+		});
+
+		it("does not show unstake warning after switching to Unstake (value gets reset)", async () => {
+			const user = userEvent.setup();
+			renderStakingPage((snapshot) => {
+				snapshot.set(inputState, "2");
+			});
+
+			await user.click(screen.getByRole("button", { name: /Unstake/ }));
+
+			// After switching, value is reset to "" by ActionSection
+			expect(
+				screen.queryByText(/Unstake amount exceeds your staked amount/),
+			).not.toBeInTheDocument();
+		});
+
+		it("does not show unstake warning when value is 0", async () => {
+			const user = userEvent.setup();
+			renderStakingPage((snapshot) => {
+				snapshot.set(inputState, "0");
+			});
+
+			await user.click(screen.getByRole("button", { name: /Unstake/ }));
+
+			expect(
+				screen.queryByText(/Unstake amount exceeds your staked amount/),
+			).not.toBeInTheDocument();
+		});
+	});
+
+	describe("UI conditional rendering", () => {
+		it("does not show L2 badge when operator is not L2", () => {
+			renderStakingPage();
+
+			// The L2 badge should not be present for non-L2 operator
+			const l2Badges = screen.queryAllByText("L2");
+			// L2 badge in the operator name area should not exist
+			expect(l2Badges.length).toBe(0);
+		});
+
+		it("shows L2 badge when operator is L2", () => {
+			const l2Operator: Operator = { ...TEST_OPERATOR, isL2: true };
+
+			renderStakingPage((snapshot) => {
+				snapshot.set(operatorsListState, [l2Operator]);
+			});
+
+			const l2Badges = screen.getAllByText("L2");
+			expect(l2Badges.length).toBeGreaterThanOrEqual(1);
+		});
+
+		it("hides token type selector when Unstake is active", async () => {
+			const user = userEvent.setup();
+			renderStakingPage();
+
+			await user.click(screen.getByRole("button", { name: /Unstake/ }));
+
+			// WTON tab should disappear when Unstake is active
+			expect(screen.queryByText("WTON")).not.toBeInTheDocument();
+		});
+
+		it("hides token type selector when Restake is active", async () => {
+			const user = userEvent.setup();
+			renderStakingPage();
+
+			await user.click(screen.getByRole("button", { name: "Restake" }));
+
+			// WTON tab should disappear when Restake is active
+			expect(screen.queryByText("WTON")).not.toBeInTheDocument();
+		});
+
+		it("displays Withdraw action button for non-L2 operator", () => {
+			renderStakingPage();
+
+			// Non-L2 operator should show a simple Withdraw button (not dropdown)
+			expect(screen.getByRole("button", { name: "Withdraw" })).toBeInTheDocument();
+		});
+
+		it("shows 'Enter an amount' for main button when value is 0.00", () => {
+			renderStakingPage((snapshot) => {
+				snapshot.set(inputState, "0.00");
+			});
+
+			const mainButton = screen.getByRole("button", { name: /Enter an amount/i });
+			expect(mainButton).toBeDisabled();
+		});
+
+		it("shows 'Stake' button text when action is Stake with valid value", () => {
+			renderStakingPage((snapshot) => {
+				snapshot.set(inputState, "0.5");
+			});
+
+			// Multiple "Stake" buttons exist (tab + main), main is last
+			const stakeButtons = screen.getAllByRole("button", { name: /^Stake$/i });
+			const mainButton = stakeButtons[stakeButtons.length - 1];
+			expect(mainButton).toHaveTextContent("Stake");
+		});
+
+		it("shows 'Enter an amount' after switching to Unstake (ActionSection resets value)", async () => {
+			const user = userEvent.setup();
+			renderStakingPage((snapshot) => {
+				snapshot.set(inputState, "0.5");
+			});
+
+			// Switch to Unstake - ActionSection calls setValue("")
+			await user.click(screen.getByRole("button", { name: /Unstake/ }));
+
+			// After reset, button shows "Enter an amount"
+			const mainButtons = screen.getAllByRole("button").filter(
+				btn => btn.classList.contains("w-full")
+			);
+			expect(mainButtons[0]).toHaveTextContent("Enter an amount");
+		});
+
+		it("shows 'Withdraw' button text when Withdraw action is selected with non-zero withdrawable", async () => {
+			mockWithdrawableData.mockReturnValue({
+				withdrawableAmount: "5000000000000000000000000000", // 5 TON in RAY
+				withdrawableLength: "1",
+				pendingRequests: 1,
+				pendingUnstaked: "0",
+				isLoading: false,
+			});
+
+			const user = userEvent.setup();
+			const queryClient = new QueryClient({
+				defaultOptions: { queries: { retry: false, gcTime: 0 } },
+			});
+
+			const initializeState = (snapshot: MutableSnapshot) => {
+				snapshot.set(operatorsListState, [TEST_OPERATOR]);
+			};
+
+			render(
+				<WagmiProvider config={testConfig}>
+					<QueryClientProvider client={queryClient}>
+						<RecoilRoot initializeState={initializeState}>
+							<Page />
+						</RecoilRoot>
+					</QueryClientProvider>
+				</WagmiProvider>,
+			);
+
+			await user.click(screen.getByRole("button", { name: "Withdraw" }));
+
+			const mainButtons = screen.getAllByRole("button").filter(
+				btn => btn.classList.contains("w-full")
+			);
+			expect(mainButtons[0]).toHaveTextContent("Withdraw");
+		});
+
+		it("shows loading spinner on main button when txPending is true", () => {
+			const queryClient = new QueryClient({
+				defaultOptions: { queries: { retry: false, gcTime: 0 } },
+			});
+
+			const initializeState = (snapshot: MutableSnapshot) => {
+				snapshot.set(operatorsListState, [TEST_OPERATOR]);
+				snapshot.set(inputState, "1");
+				snapshot.set(txPendingStatus, true);
+			};
+
+			render(
+				<WagmiProvider config={testConfig}>
+					<QueryClientProvider client={queryClient}>
+						<RecoilRoot initializeState={initializeState}>
+							<Page />
+						</RecoilRoot>
+					</QueryClientProvider>
+				</WagmiProvider>,
+			);
+
+			// When txPending is true, the main button should show a spinner (animate-spin)
+			const mainButtons = screen.getAllByRole("button").filter(
+				btn => btn.classList.contains("w-full")
+			);
+			const mainButton = mainButtons[0];
+			expect(mainButton).toBeDisabled();
+
+			const spinner = mainButton.querySelector(".animate-spin");
+			expect(spinner).toBeInTheDocument();
+		});
+
+		it("does not render L2 sequencer seigniorage section when isCandidateAddon is false", () => {
+			renderStakingPage();
+
+			// The "Sequencer seigniorage" title should not exist when isCandidateAddon is false
+			expect(screen.queryByText("Sequencer seigniorage")).not.toBeInTheDocument();
+			expect(screen.queryByText("TON Bridged to L2")).not.toBeInTheDocument();
+			expect(screen.queryByText("Claimable Seigniorage")).not.toBeInTheDocument();
+		});
 	});
 });
