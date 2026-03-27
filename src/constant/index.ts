@@ -14,10 +14,16 @@ export const SUPPORTED_CHAIN_IDS = [1, 11155111];
 // REACT_APP_MODE === "PRODUCTION" ? "1" : "11155111";
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
-export const PUBLIC_SEPOLIA_RPC = 
-	process.env.NEXT_PUBLIC_SEPOLIA_RPC || "https://sepolia.gateway.tenderly.co";
-export const PUBLIC_MAINNET_RPC = 
-	process.env.NEXT_PUBLIC_ETHEREUM_RPC || "https://mainnet.gateway.tenderly.co";
+export const PUBLIC_SEPOLIA_RPC =
+	process.env.NEXT_PUBLIC_SEPOLIA_RPC ?? "https://sepolia.gateway.tenderly.co";
+export const PUBLIC_MAINNET_RPC = (() => {
+	const rpc = process.env.NEXT_PUBLIC_ETHEREUM_RPC;
+	if (rpc) return rpc;
+	if (REACT_APP_MODE === "PRODUCTION" && typeof window !== "undefined" && process.env.NODE_ENV !== "test") {
+		throw new Error("NEXT_PUBLIC_ETHEREUM_RPC is required in production. Public RPC exposes transactions to MEV.");
+	}
+	return "https://mainnet.gateway.tenderly.co";
+})();
 
 // export const ETHERSCAN_LINK = REACT_APP_MODE === "PRODUCTION" ? "https://etherscan.io" : "https://sepolia.etherscan.io"
 export const ETHERSCAN_LINK = 

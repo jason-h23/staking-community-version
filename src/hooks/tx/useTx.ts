@@ -44,18 +44,7 @@ export function useTransaction() {
 			});
 	}, [txData]);
 
-	const confirmedApproveTransaction = useMemo(() => {
-		if (txData) {
-			const filteredData = Object.entries(txData).filter(([, value]) => {
-				return value.transactionState === "success";
-			})[0];
-			if (filteredData && filteredData[1]) {
-				return filteredData[1];
-			}
-		}
-	}, [txData]);
-
-	const confirmedRevokeTransaction = useMemo(() => {
+	const confirmedSuccessTransaction = useMemo(() => {
 		if (txData) {
 			const filteredData = Object.entries(txData).filter(([, value]) => {
 				return value.transactionState === "success";
@@ -72,8 +61,7 @@ export function useTransaction() {
 		isPending,
 		pendingTransactionToApprove,
 		confirmedTransaction,
-		confirmedApproveTransaction,
-		confirmedRevokeTransaction,
+		confirmedSuccessTransaction,
 	};
 }
 

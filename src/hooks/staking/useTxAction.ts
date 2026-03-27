@@ -1,10 +1,11 @@
 import { useWriteContract, useChainId } from "wagmi";
 import { useTx } from "../tx/useTx";
 import { getContractAddress } from "@/constant/contracts";
+import type { AbiInput } from "./operators/types";
 
 interface TxActionConfig {
 	contractKey: keyof ReturnType<typeof getContractAddress>;
-	abi: any;
+	abi: AbiInput;
 	functionName: string;
 	layer2: string;
 }
@@ -21,7 +22,7 @@ export function useTxAction(config: TxActionConfig) {
 		writeContract,
 	} = useWriteContract();
 
-	const execute = (args: any) => {
+	const execute = (args: readonly unknown[]) => {
 		return writeContract({
 			address: contractAddress,
 			abi,

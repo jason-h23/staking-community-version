@@ -1,25 +1,28 @@
 import { getContract, isAddress, PublicClient } from "viem";
+import type { AbiInput } from "./types";
 
-const contractCache = new Map<string, any>();
+const contractCache = new Map<string, ReturnType<typeof getContract>>();
 const contractExistsCache = new Map<string, boolean>();
 
 export function createContractInstance(
 	publicClient: PublicClient,
 	contractAddress: string,
-	abi: any,
-): any {
+	abi: AbiInput,
+) {
 	if (!publicClient || !contractAddress) return null;
 
-	const cacheKey = `${contractAddress}-${abi.contractName || "unknown"}`;
+	const contractName = !Array.isArray(abi) && "contractName" in abi ? abi.contractName : "unknown";
+	const cacheKey = `${contractAddress}-${contractName}`;
 
 	if (contractCache.has(cacheKey)) {
 		return contractCache.get(cacheKey);
 	}
 
 	try {
+		const resolvedAbi = Array.isArray(abi) ? abi : abi.abi;
 		const contract = getContract({
 			address: contractAddress as `0x${string}`,
-			abi: abi.abi || abi,
+			abi: resolvedAbi as readonly Record<string, unknown>[],
 			client: publicClient,
 		});
 

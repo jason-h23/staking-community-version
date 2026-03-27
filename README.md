@@ -24,8 +24,8 @@ The app works on **Ethereum mainnet** (for real transactions) and **Sepolia test
 - **A Web3 wallet** like MetaMask (recommended for beginners)
 
 ### Software Requirements
-- **Node.js**: Version 18.0.0 or higher (LTS version recommended)
-- **npm**: Version 9.0.0 or higher (comes with Node.js)
+- **Node.js**: Version 20.0.0 or higher (LTS version recommended)
+- **npm**: Version 10.0.0 or higher (comes with Node.js)
 - **Git**: Version 2.0.0 or higher
 
 ### Supported Networks
@@ -518,7 +518,46 @@ If you're a developer and want to deploy this app:
 1. Build: `docker build -t staking-community-version .`
 2. Run: `docker run -p 3000:3000 staking-community-version` -->
 
-## Support 
+## Testing
+
+### Unit & Integration Tests (Vitest + React Testing Library)
+
+```bash
+# Run all tests
+npx vitest run
+
+# Run tests in watch mode
+npx vitest
+
+# Run with coverage report
+npx vitest run --coverage
+```
+
+### E2E Tests (Playwright)
+
+```bash
+# Run E2E tests (requires dev server)
+npm run test:e2e
+
+# Run E2E tests with UI
+npm run test:e2e:ui
+```
+
+### Test Structure
+
+```
+src/__tests__/           # Unit & integration tests
+  ├── helpers/           # Test utilities (wrapper, mocks)
+  ├── components/        # Component integration tests
+  └── *.test.ts          # Hook/util tests
+e2e/                     # Playwright E2E tests
+  ├── helpers/           # Mock wallet provider
+  └── *.spec.ts          # E2E scenarios
+```
+
+**Coverage**: 88% statements, 80% functions (269 tests, 0 failures)
+
+## Support
 
 - **GitHub Issues**: [Report bugs or request features](https://github.com/tokamak-network/staking-community-version/issues)
 
