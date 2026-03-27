@@ -9,4 +9,8 @@ export interface CommonContracts {
 	ton: any;
 }
 
+export type AbiInput =
+	| readonly Record<string, unknown>[]
+	| { abi: readonly Record<string, unknown>[]; contractName?: string };
+
 export type { Operator };

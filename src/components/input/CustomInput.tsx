@@ -8,13 +8,13 @@ type InputProp = {
 	h?: number | string;
 	value?: string | number;
 	isError?: boolean;
-	maxValue?: any;
+	maxValue?: string | number;
 	type?: string;
 	index?: string;
 };
 
-const addComma = (inputVal: any) => {
-	const _val = inputVal;
+const addComma = (inputVal: string | number | undefined): string => {
+	const _val = inputVal !== undefined ? String(inputVal) : undefined;
 	const checkInputVal = () => {
 		if (_val) {
 			const floatLen = _val.split(".")[1]?.length;
@@ -22,7 +22,7 @@ const addComma = (inputVal: any) => {
 				return floatLen > 18 ? _val.slice(0, -1) : _val;
 			}
 			if (_val.split(".").length > 2) {
-				return;
+				return _val.slice(0, -1);
 			}
 			if (
 				_val.split(".")[0]?.length > 1 &&
@@ -34,14 +34,14 @@ const addComma = (inputVal: any) => {
 				return _val;
 			} else {
 				return _val
-					.replace(/[^0-9a-zA-Z.]/g, "")
+					.replace(/[^0-9.]/g, "")
 					.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 			}
 		}
 		return "";
 	};
 
-	return checkInputVal();
+	return checkInputVal() ?? "";
 };
 
 function BalanceInput(props: InputProp) {

@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAccount, useChainId } from "wagmi";
+import { isAddress } from "viem";
 import { useRecoilValue, useRecoilState } from "recoil";
 import {
 	filteredOperatorsState,
@@ -89,6 +90,7 @@ export default function Page() {
 	const { refreshOperator } = useOperatorData();
 
 	const [isClient, setIsClient] = useState(false);
+	const [txError, setTxError] = useState<string | null>(null);
 
 	const { expectedSeig: expSeig, isLoading: expectedSeigLoading } = useExpectedSeig(
 		candidateAddress as `0x${string}`,
@@ -101,8 +103,8 @@ export default function Page() {
 	}, []);
 
 	useEffect(() => {
-		if (!address) router.push("/");
-	}, [address, router]);
+		if (!address || !isAddress(candidateAddress)) router.push("/");
+	}, [address, candidateAddress, router]);
 
 	useEffect(() => {
 		if (candidateAddress && operatorsList.length > 0) {
@@ -201,6 +203,7 @@ export default function Page() {
 	}, [activeAction, isCandidateAddon]);
 
 	const onClick = useCallback(async () => {
+		setTxError(null);
 		const amount = floatParser(value);
 		let tx;
 		const yourStaked = Number(
@@ -266,8 +269,9 @@ export default function Page() {
 					default:
 						break;
 				}
-			} catch (err: any) {
-				// Error handling
+			} catch (err) {
+				const message = err instanceof Error ? err.message : "Transaction failed";
+				setTxError(message.includes("User rejected") ? "Transaction rejected" : message);
 			}
 			return tx;
 		}
@@ -488,6 +492,12 @@ export default function Page() {
 							getButtonText(value, activeAction)
 						))}
 				</button>
+
+				{txError && (
+					<div className="text-sm text-[#FF2D78] text-center px-4 font-normal w-full mb-2 mt-2">
+						{txError}
+					</div>
+				)}
 
 				{activeAction === "Unstake" && showUnstakeWarning() && (
 					<div className="text-sm text-[#FF2D78] text-center px-4 font-normal w-full mb-4">

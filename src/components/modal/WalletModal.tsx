@@ -114,7 +114,7 @@ const WalletModal: FC = () => {
 	}, [isOpen, isMobile]);
 
 	useEffect(() => {
-		const { ethereum } = window as any;
+		const ethereum = window.ethereum;
 		if (!ethereum || !ethereum.request) {
 			setChainId(null);
 			return;
@@ -125,7 +125,7 @@ const WalletModal: FC = () => {
 				const hexChainId = await ethereum.request({
 					method: "eth_chainId",
 				});
-				const parsed = parseInt("0xAA36A7", 16);
+				const parsed = parseInt(String(hexChainId), 16);
 				setChainId(parsed);
 			} catch {
 				setChainId(null);
